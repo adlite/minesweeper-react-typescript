@@ -86,3 +86,6 @@ typings/
 
 # JetBrains IDEs
 .idea
+
+# Husky
+.husky
