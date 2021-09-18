@@ -89,6 +89,19 @@ export default class Game extends React.PureComponent<IProps, IState> {
     return x >= 1 || x <= Settings.FieldsConstraintsX || y >= 1 || y <= Settings.FieldsConstraintsY;
   }
 
+  findAllCoordsAroundField(x: number, y: number): number[][] {
+    return [
+      [x - 1, y - 1],
+      [x, y - 1],
+      [x + 1, y - 1],
+      [x - 1, y],
+      [x + 1, y],
+      [x - 1, y + 1],
+      [x, y + 1],
+      [x + 1, y + 1],
+    ];
+  }
+
   generateFields(): IField[] {
     const fieldsWithBombsIds: Set<number> = new Set();
     const fields: IField[] = [];
@@ -126,17 +139,7 @@ export default class Game extends React.PureComponent<IProps, IState> {
       if (field.hasBomb) {
         const {x, y} = field.coords;
         const foundFields: Array<IField | undefined> = [];
-
-        const coordsAroundField = [
-          [x - 1, y - 1],
-          [x, y - 1],
-          [x + 1, y - 1],
-          [x - 1, y],
-          [x + 1, y],
-          [x - 1, y + 1],
-          [x, y + 1],
-          [x + 1, y + 1],
-        ];
+        const coordsAroundField = this.findAllCoordsAroundField(x, y);
 
         for (const [x, y] of coordsAroundField) {
           if (this.areCoordsInBoundaries(x, y)) {
@@ -166,11 +169,57 @@ export default class Game extends React.PureComponent<IProps, IState> {
 
   handleFieldClick = (clickedField: IField) => {
     if (clickedField.hasBomb) {
+      // Set game over if clicked field has bomb and open all fields with bombs
       this.setState((state) => ({
         gameState: GameState.GameOver,
         fields: state.fields.map((field) => ({
           ...field,
           isOpened: field.isOpened || field.hasBomb,
+        })),
+      }));
+    } else if (clickedField.bombsAround === 0) {
+      const emptiesStack: IField[] = [clickedField];
+      const verifiedEmptiesIds = new Set<number>();
+      const fieldIdsToOpen = new Set<number>();
+
+      // Recursively check all empty fields around clicked field
+      // and save their IDs into fieldIdsToOpen set
+      const verifyEmptiesAround = (field: IField) => {
+        const {x, y} = field.coords;
+        const coordsAround = this.findAllCoordsAroundField(x, y);
+
+        for (const [x, y] of coordsAround) {
+          if (this.areCoordsInBoundaries(x, y)) {
+            const sibling = this.findFieldByCoords(this.state.fields, x, y);
+
+            if (sibling) {
+              fieldIdsToOpen.add(sibling.id);
+
+              if (
+                sibling.bombsAround === 0 &&
+                !emptiesStack.find(({id}) => id === sibling.id) &&
+                !verifiedEmptiesIds.has(sibling.id)
+              ) {
+                emptiesStack.push(sibling);
+              }
+            }
+          }
+        }
+
+        verifiedEmptiesIds.add(field.id);
+        emptiesStack.shift();
+
+        if (emptiesStack.length > 0) {
+          verifyEmptiesAround(emptiesStack[0]);
+        }
+      };
+
+      verifyEmptiesAround(clickedField);
+
+      this.setState((state) => ({
+        fields: state.fields.map((field) => ({
+          ...field,
+          isOpened: field.isOpened || fieldIdsToOpen.has(field.id),
         })),
       }));
     } else {

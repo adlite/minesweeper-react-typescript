@@ -1,7 +1,7 @@
 :root {
-  --field-bg-color: #b6c2b3;
-  --field-bg-active-color: #c5d7c2;
-  --field-bg-has-bomb-color: #c62a2a;
+  --field-bg-color: #b0b0b0;
+  --field-bg-active-color: #e5e5e5;
+  --field-bg-has-bomb-color: #984b4b;
   --field-bg-disabled-color: #999b99;
   --field-border-color: #2b2b2b;
 }
@@ -38,6 +38,9 @@
   background-color: var(--field-bg-disabled-color);
 }
 
-.hasOpenedBomb {
+.hasOpenedBomb,
+.hasOpenedBomb:hover,
+.hasOpenedBomb:active {
   color: black;
+  background-color: var(--field-bg-has-bomb-color);
 }
