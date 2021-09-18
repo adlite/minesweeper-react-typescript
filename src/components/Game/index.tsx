@@ -1,7 +1,7 @@
 import React from 'react';
 import Field from '../Field';
 import {GameState, IField, Settings, TimerID} from '../types';
-import {randomNumber} from '../../utils/helpers';
+import {formatSeconds, randomNumber} from '../../utils/helpers';
 
 import style from './style.module.css';
 
@@ -270,14 +270,14 @@ export default class Game extends React.PureComponent<IProps, IState> {
   }
 
   render() {
-    const {fields, freeFlagsCount, gameState, timer} = this.state;
+    const {freeFlagsCount, gameState, timer} = this.state;
 
     return (
       <div className={style.Game}>
         <section className={style.fields}>{this.renderFields()}</section>
         <aside className={style.aside}>
           <div className={style.stats}>
-            <p>Time: 0:{timer}</p>
+            <p>Time: {formatSeconds(timer)}</p>
             <p>
               Flags: {freeFlagsCount}/{Settings.BombsCount}
             </p>

@@ -4,7 +4,7 @@ import {GameState, IField} from '../types';
 
 import style from './style.module.css';
 
-interface Props {
+interface IProps {
   field: IField;
   gameState: GameState;
   onOpen: (field: IField) => void;
@@ -12,7 +12,7 @@ interface Props {
   onDeleteFlag: (field: IField) => void;
 }
 
-export default function Field({field, gameState, onOpen, onSetFlag, onDeleteFlag}: Props) {
+export default function Field({field, gameState, onOpen, onSetFlag, onDeleteFlag}: IProps) {
   const isDisabled = gameState !== GameState.Playing;
   let label: number | string = '';
 
@@ -43,6 +43,7 @@ export default function Field({field, gameState, onOpen, onSetFlag, onDeleteFlag
   const handleContextMenuClick = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     // Disable context menu
     event.preventDefault();
+
     if (gameState === GameState.Playing) {
       if (field.hasFlag) {
         onDeleteFlag(field);
