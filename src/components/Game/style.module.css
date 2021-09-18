@@ -1,0 +1,55 @@
+.Game {
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  max-width: 600px;
+  border: 1px solid #1f1f1f;
+  border-radius: 6px;
+  overflow: hidden;
+  background-color: #2b2b2b;
+}
+
+.fields {
+  width: 400px;
+  height: 400px;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+  gap: 0;
+}
+
+.aside {
+  min-width: 200px;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.button {
+  width: 100%;
+  padding: 20px 0;
+  margin-bottom: 5px;
+  background-color: #54595b;
+  color: #e5e5e5;
+  border: 2px solid #2b2b2b;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 200ms;
+}
+
+.button:hover {
+  background-color: #6a7173;
+}
+
+.button:active {
+  background-color: #3c3f41;
+}
+
+.button:last-child {
+  margin-bottom: 0;
+}
+
+.stats {
+  text-align: center;
+}

@@ -10,6 +10,7 @@
     "@types/node": "^12.20.25",
     "@types/react": "^17.0.21",
     "@types/react-dom": "^17.0.9",
+    "classnames": "^2.3.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-scripts": "4.0.3",
@@ -17,10 +18,10 @@
     "web-vitals": "^1.1.2"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
+    "app:start": "react-scripts start",
+    "app:build": "react-scripts build",
+    "app:test": "react-scripts test",
+    "app:eject": "react-scripts eject",
     "prettier:inspect": "prettier --check \"./**/*.{js,jsx,ts,tsx,json,css}\" --ignore-path .gitignore",
     "prettier:fix": "prettier --write \"./**/*.{js,jsx,ts,tsx,json,css}\" --ignore-path .gitignore",
     "eslint:inspect": "eslint \"./**/*.{js,jsx,ts,tsx}\" --ignore-path .gitignore .",
@@ -53,9 +54,7 @@
     "prettier": "^2.4.1"
   },
   "lint-staged": {
-    "*.{js,jsx,ts,tsx,json,css}": [
-      "prettier --write --ignore-path .gitignore",
-      "eslint --ignore-path .gitignore --fix"
-    ]
+    "*.{js,jsx,ts,tsx,json,css}": "prettier --write --ignore-path .gitignore",
+    "*.{js,jsx,ts,tsx}": "eslint --ignore-path .gitignore --fix"
   }
 }

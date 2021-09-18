@@ -1,0 +1,16 @@
+* {
+  box-sizing: border-box;
+}
+
+body,
+html {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-primary-color);
+  color: var(--text-primary-color);
+  font-family: sans-serif;
+  font-weight: normal;
+  font-size: 16px;
+  line-height: 1.618; /* based on https://medium.com/@zkareemz/golden-ratio-62b3b6d4282a; */
+  -webkit-text-size-adjust: 100%;
+}
