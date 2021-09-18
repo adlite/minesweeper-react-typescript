@@ -7,10 +7,12 @@ import style from './style.module.css';
 interface Props {
   field: IField;
   gameState: GameState;
-  onClick: (field: IField) => void;
+  onOpen: (field: IField) => void;
+  onSetFlag: (field: IField) => void;
+  onDeleteFlag: (field: IField) => void;
 }
 
-export default function Field({field, gameState, onClick}: Props) {
+export default function Field({field, gameState, onOpen, onSetFlag, onDeleteFlag}: Props) {
   const isDisabled = gameState !== GameState.Playing;
   let label: number | string = '';
 
@@ -20,6 +22,8 @@ export default function Field({field, gameState, onClick}: Props) {
     } else if (field.bombsAround) {
       label = field.bombsAround;
     }
+  } else if (field.hasFlag) {
+    label = '🚩';
   }
 
   const classes = cn({
@@ -29,8 +33,27 @@ export default function Field({field, gameState, onClick}: Props) {
     [style.hasOpenedBomb]: field.isOpened && field.hasBomb,
   });
 
+  // Handlers
+  const handleClick = () => {
+    if (!field.hasFlag) {
+      onOpen(field);
+    }
+  };
+
+  const handleContextMenuClick = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    // Disable context menu
+    event.preventDefault();
+    if (gameState === GameState.Playing) {
+      if (field.hasFlag) {
+        onDeleteFlag(field);
+      } else {
+        onSetFlag(field);
+      }
+    }
+  };
+
   return (
-    <button className={classes} onClick={() => onClick(field)} disabled={isDisabled}>
+    <button className={classes} disabled={isDisabled} onClick={handleClick} onContextMenu={handleContextMenuClick}>
       {label}
     </button>
   );

@@ -19,7 +19,7 @@ export default class Game extends React.PureComponent<IProps, IState> {
     fields: this.generateFields(),
     timer: 0,
     gameState: GameState.Idle,
-    freeFlagsCount: Settings.BombsCount,
+    freeFlagsCount: 10, // TODO: change it from settings
   };
 
   timerId!: TimerID;
@@ -232,9 +232,40 @@ export default class Game extends React.PureComponent<IProps, IState> {
     }
   };
 
+  handleSetFlag = (clickedField: IField) => {
+    if (this.state.freeFlagsCount === 0) {
+      return;
+    }
+
+    this.setState((state) => ({
+      fields: state.fields.map((field) => ({
+        ...field,
+        hasFlag: clickedField.id === field.id || field.hasFlag,
+      })),
+      freeFlagsCount: state.freeFlagsCount - 1,
+    }));
+  };
+
+  handleDeleteFlag = (clickedField: IField) => {
+    this.setState((state) => ({
+      fields: state.fields.map((field) => ({
+        ...field,
+        hasFlag: field.hasFlag && clickedField.id === field.id ? false : field.hasFlag,
+      })),
+      freeFlagsCount: state.freeFlagsCount + 1,
+    }));
+  };
+
   renderFields() {
     return this.state.fields.map((field) => (
-      <Field key={field.id} field={field} gameState={this.state.gameState} onClick={this.handleFieldClick} />
+      <Field
+        key={field.id}
+        field={field}
+        gameState={this.state.gameState}
+        onOpen={this.handleFieldClick}
+        onSetFlag={this.handleSetFlag}
+        onDeleteFlag={this.handleDeleteFlag}
+      />
     ));
   }
 
@@ -247,7 +278,9 @@ export default class Game extends React.PureComponent<IProps, IState> {
         <aside className={style.aside}>
           <div className={style.stats}>
             <p>Time: 0:{timer}</p>
-            <p>Flags: 0/10</p>
+            <p>
+              Flags: {freeFlagsCount}/{Settings.BombsCount}
+            </p>
           </div>
           <div className={style.buttonWrapper}>
             {gameState === GameState.Playing || (
