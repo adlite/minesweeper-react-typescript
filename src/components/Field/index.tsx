@@ -1,6 +1,6 @@
 import React from 'react';
 import cn from 'classnames';
-import {GameState, IField} from '../types';
+import {GameState, IField} from '../../types';
 
 import style from './style.module.css';
 

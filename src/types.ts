@@ -25,5 +25,3 @@ export enum GameState {
   Pause = 'Pause',
   GameOver = 'GameOver',
 }
-
-export type TimerID = ReturnType<typeof setTimeout>;
