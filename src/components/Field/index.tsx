@@ -31,6 +31,12 @@ export default function Field({field, gameState, onOpen, onSetFlag, onDeleteFlag
     [style.isOpened]: field.isOpened,
     [style.isDisabled]: isDisabled,
     [style.hasOpenedBomb]: field.isOpened && field.hasBomb,
+    [style.dangerLevel1]: field.isOpened && field.bombsAround === 1,
+    [style.dangerLevel2]: field.isOpened && field.bombsAround === 2,
+    [style.dangerLevel3]: field.isOpened && field.bombsAround === 3,
+    [style.dangerLevel4]: field.isOpened && field.bombsAround === 4,
+    [style.dangerLevel5]: field.isOpened && field.bombsAround === 5,
+    [style.dangerLevel6]: field.isOpened && field.bombsAround >= 6,
   });
 
   // Handlers

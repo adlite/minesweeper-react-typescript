@@ -1,9 +1,15 @@
 :root {
   --field-bg-color: #b0b0b0;
-  --field-bg-active-color: #e5e5e5;
+  --field-bg-active-color: #f5f5f5;
   --field-bg-has-bomb-color: #984b4b;
   --field-bg-disabled-color: #999b99;
   --field-border-color: #2b2b2b;
+  --field-danger-lvl-1-color: #2a9a0b;
+  --field-danger-lvl-2-color: #ff9900;
+  --field-danger-lvl-3-color: #ff2a04;
+  --field-danger-lvl-4-color: #7a0000;
+  --field-danger-lvl-5-color: #600707;
+  --field-danger-lvl-6-color: #431d04;
 }
 
 .Field {
@@ -14,6 +20,7 @@
   border-radius: 4px;
   cursor: pointer;
   font-weight: bold;
+  font-size: 18px;
 }
 
 .Field:hover {
@@ -43,4 +50,28 @@
 .hasOpenedBomb:active {
   color: black;
   background-color: var(--field-bg-has-bomb-color);
+}
+
+.dangerLevel1 {
+  color: var(--field-danger-lvl-1-color);
+}
+
+.dangerLevel2 {
+  color: var(--field-danger-lvl-2-color);
+}
+
+.dangerLevel3 {
+  color: var(--field-danger-lvl-3-color);
+}
+
+.dangerLevel4 {
+  color: var(--field-danger-lvl-4-color);
+}
+
+.dangerLevel5 {
+  color: var(--field-danger-lvl-5-color);
+}
+
+.dangerLevel6 {
+  color: var(--field-danger-lvl-6-color);
 }
