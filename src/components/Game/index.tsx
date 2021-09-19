@@ -67,10 +67,16 @@ export default function Game() {
       </section>
       <aside className={style.aside}>
         <div className={style.stats}>
-          <p>Time: {formattedTimer}</p>
-          <p>
-            Flags: {freeFlagsCount}/{Settings.BombsCount}
-          </p>
+          <div className={style.statBlock}>
+            <div className={style.statEmoji}>🕑</div>
+            <div className={style.statValue}>{formattedTimer}</div>
+          </div>
+          <div className={style.statBlock}>
+            <div className={style.statEmoji}>🚩</div>
+            <div className={style.statValue}>
+              {freeFlagsCount}/{Settings.BombsCount}
+            </div>
+          </div>
         </div>
         <div className={style.buttonWrapper}>
           {gameState === GameState.Playing || (

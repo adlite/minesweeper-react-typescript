@@ -53,3 +53,20 @@
 .stats {
   text-align: center;
 }
+
+.statBlock {
+  margin-bottom: 15px;
+}
+
+.statBlock:last-child {
+  margin-bottom: 0;
+}
+
+.statEmoji {
+  font-size: 32px;
+}
+
+.statValue {
+  font-weight: bold;
+  font-size: 18px;
+}
