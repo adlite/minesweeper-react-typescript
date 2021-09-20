@@ -11,7 +11,7 @@ export default function Game() {
     formattedTimer,
     gameState,
     freeFlagsCount,
-    play,
+    prepareGame,
     continuePlaying,
     pause,
     openField,
@@ -39,10 +39,6 @@ export default function Game() {
   }
 
   // Event handlers
-  function handlePlayButtonClick(): void {
-    play(gameState === GameState.GameOver || gameState === GameState.Pause);
-  }
-
   function handlePauseButtonClick() {
     if (gameState === GameState.Pause) {
       continuePlaying();
@@ -79,8 +75,8 @@ export default function Game() {
           </div>
         </div>
         <div className={style.buttonWrapper}>
-          {gameState === GameState.Playing || (
-            <button className={style.button} onClick={handlePlayButtonClick}>
+          {gameState === GameState.Playing || gameState === GameState.Idle || (
+            <button className={style.button} onClick={prepareGame}>
               {getPlayButtonLabel()}
             </button>
           )}

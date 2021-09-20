@@ -5,7 +5,7 @@ import useInterval from './useInterval';
 
 export default function useMinesGame() {
   // State of the game
-  const [fields, setFields] = useState<IField[]>(generateFields()); // array of game fields
+  const [fields, setFields] = useState<IField[]>(generateEmptyFields()); // array of game fields
   const [fieldsOpened, setFieldsOpened] = useState<number>(0); // array of game fields which has been opened
   const [timer, setTimer] = useState<number>(0); // time in seconds spent on the game
   const [formattedTimer, setFormattedTimer] = useState<string>('00:00'); // formatted HH:MM:SS `timer`
@@ -34,11 +34,11 @@ export default function useMinesGame() {
   }, [fieldsOpened]);
 
   // Public methods
-  function play(regenerate: boolean): void {
-    setFields(regenerate ? generateFields() : fields);
+  function prepareGame(): void {
+    setFields(generateEmptyFields());
     setFieldsOpened(0);
     setTimer(0);
-    setGameState(GameState.Playing);
+    setGameState(GameState.Idle);
     setFreeFlagsCount(Settings.BombsCount);
   }
 
@@ -56,11 +56,28 @@ export default function useMinesGame() {
     }
 
     if (clickedField.hasBomb) {
-      openBombsAndGameOver();
+      // Handle click on field with bomb
+      setGameState(GameState.GameOver);
+      setFields(openAllBombs(fields));
+    } else if (fieldsOpened === 0) {
+      // Handle first click.
+      // Set game state to `Playing`
+      setGameState(GameState.Playing);
+      // Regenerate fields with bombs and then open fields around first clicked field.
+      // The first click in any game will never be a mine.
+      const empties = openEmptyFields(clickedField, generateFieldsWithBombs(clickedField));
+      setFields(empties.fields);
+      // Add opened fields to counter
+      setFieldsOpened(empties.opened);
     } else if (clickedField.bombsAround === 0) {
-      openEmptyFields(clickedField);
+      // Handle click on empty field
+      const empties = openEmptyFields(clickedField, fields);
+      setFields(empties.fields);
+      setFieldsOpened(fieldsOpened + empties.opened);
     } else {
-      openFieldWithBombsAround(clickedField);
+      // Handle click with number of bombs around
+      setFields(openFieldWithBombsAround(clickedField));
+      setFieldsOpened(fieldsOpened + 1);
     }
   }
 
@@ -91,17 +108,14 @@ export default function useMinesGame() {
   }
 
   // Private methods
-  function openBombsAndGameOver(): void {
-    setGameState(GameState.GameOver);
-    setFields(
-      fields.map((field) => ({
-        ...field,
-        isOpened: field.isOpened || field.hasBomb,
-      })),
-    );
+  function openAllBombs(fields: IField[]): IField[] {
+    return fields.map((field) => ({
+      ...field,
+      isOpened: field.isOpened || field.hasBomb,
+    }));
   }
 
-  function openEmptyFields(clickedField: IField): void {
+  function openEmptyFields(clickedField: IField, fields: IField[]): {opened: number; fields: IField[]} {
     const emptiesStack: IField[] = [clickedField];
     const fieldIdsToOpen = new Set<number>([clickedField.id]);
     const verifiedEmptiesIds = new Set<number>();
@@ -110,22 +124,20 @@ export default function useMinesGame() {
     // and save their IDs into fieldIdsToOpen set
     const verifyEmptiesAround = (field: IField) => {
       const {x, y} = field.coords;
-      const coordsAround = findAllCoordsAroundField(x, y);
+      const coordsAround = findCoordsAround(x, y);
 
       for (const [x, y] of coordsAround) {
-        if (isFieldInBoundaries(x, y)) {
-          const sibling = findFieldByCoords(fields, x, y);
+        const sibling = findFieldByCoords(fields, x, y);
 
-          if (sibling && !sibling.isOpened) {
-            fieldIdsToOpen.add(sibling.id);
+        if (sibling && !sibling.isOpened) {
+          fieldIdsToOpen.add(sibling.id);
 
-            if (
-              sibling.bombsAround === 0 &&
-              !emptiesStack.find(({id}) => id === sibling.id) &&
-              !verifiedEmptiesIds.has(sibling.id)
-            ) {
-              emptiesStack.push(sibling);
-            }
+          if (
+            sibling.bombsAround === 0 &&
+            !emptiesStack.find(({id}) => id === sibling.id) &&
+            !verifiedEmptiesIds.has(sibling.id)
+          ) {
+            emptiesStack.push(sibling);
           }
         }
       }
@@ -140,23 +152,20 @@ export default function useMinesGame() {
 
     verifyEmptiesAround(clickedField);
 
-    setFieldsOpened(fieldsOpened + fieldIdsToOpen.size);
-    setFields(
-      fields.map((field) => ({
+    return {
+      opened: fieldIdsToOpen.size,
+      fields: fields.map((field) => ({
         ...field,
         isOpened: field.isOpened || fieldIdsToOpen.has(field.id),
       })),
-    );
+    };
   }
 
-  function openFieldWithBombsAround(clickedField: IField): void {
-    setFieldsOpened(fieldsOpened + 1);
-    setFields(
-      fields.map((field) => ({
-        ...field,
-        isOpened: field.isOpened || clickedField.id === field.id,
-      })),
-    );
+  function openFieldWithBombsAround(clickedField: IField): IField[] {
+    return fields.map((field) => ({
+      ...field,
+      isOpened: field.isOpened || clickedField.id === field.id,
+    }));
   }
 
   // Find field in given array of fields by coordinates
@@ -165,12 +174,12 @@ export default function useMinesGame() {
   }
 
   // Checks if given X and Y coordinates are in game field boundaries
-  function isFieldInBoundaries(x: number, y: number): boolean {
-    return x >= 1 || x <= Settings.FieldsConstraintsX || y >= 1 || y <= Settings.FieldsConstraintsY;
+  function areCoordsInBoundaries(x: number, y: number): boolean {
+    return x >= 1 && x <= Settings.FieldsConstraintsX && y >= 1 && y <= Settings.FieldsConstraintsY;
   }
 
-  function findAllCoordsAroundField(x: number, y: number): number[][] {
-    return [
+  function findCoordsAround(x: number, y: number): number[][] {
+    const coords = [
       [x - 1, y - 1],
       [x, y - 1],
       [x + 1, y - 1],
@@ -180,54 +189,65 @@ export default function useMinesGame() {
       [x, y + 1],
       [x + 1, y + 1],
     ];
+
+    return coords.filter(([x, y]) => areCoordsInBoundaries(x, y));
   }
 
-  function generateFields(): IField[] {
-    const fieldsWithBombsIds: Set<number> = new Set();
-    const fields: IField[] = [];
-
-    // Random recursive generator for bombs IDs
-    const generateRandomBombs = () => {
-      fieldsWithBombsIds.add(randomNumber(1, Settings.FieldsCount));
-      if (fieldsWithBombsIds.size < Settings.BombsCount) {
-        generateRandomBombs();
-      }
-    };
-
-    generateRandomBombs();
-
-    // Create basic fields with coords
-    Array.from(Array(Settings.FieldsCount).keys()).forEach((index) => {
+  function generateEmptyFields(): IField[] {
+    return Array.from(Array(Settings.FieldsCount).keys()).map((index) => {
       // Find the coordinates dependent on the index
       const y = Math.floor(index / Settings.FieldsConstraintsY) + 1;
       const x = (index % Settings.FieldsConstraintsX) + 1;
       const id = index + 1;
 
       // Push basic field
-      fields.push({
+      return {
         id,
         coords: {y, x},
         isOpened: false,
-        hasBomb: fieldsWithBombsIds.has(id),
+        hasBomb: false,
         hasFlag: false,
         bombsAround: 0,
-      });
+      };
     });
+  }
 
-    // Create bombsAround logic
+  function generateFieldsWithBombs(firstClicked: IField): IField[] {
+    const fields: IField[] = generateEmptyFields();
+    const fieldsWithBombsIds: Set<number> = new Set();
+
+    // Generate reserved fields which can't have bombs due to the first clicked field
+    const reservedIdsAround = findCoordsAround(firstClicked.coords.x, firstClicked.coords.y).map(
+      ([x, y]) => findFieldByCoords(fields, x, y)?.id as number,
+    );
+    const reservedIds = new Set<number>([firstClicked.id, ...reservedIdsAround]);
+
+    // Random recursive generator for bombs IDs
+    const generateRandomBombs = () => {
+      if (fieldsWithBombsIds.size >= Settings.BombsCount) {
+        return;
+      }
+
+      const randomBombId = randomNumber(1, Settings.FieldsCount);
+
+      if (!reservedIds.has(randomBombId)) {
+        fieldsWithBombsIds.add(randomBombId);
+      }
+
+      // Jump into new recursion
+      generateRandomBombs();
+    };
+
+    generateRandomBombs();
+
     for (const field of fields) {
+      field.hasBomb = fieldsWithBombsIds.has(field.id);
+
       if (field.hasBomb) {
         const {x, y} = field.coords;
-        const foundFields: Array<IField | undefined> = [];
-        const coordsAroundField = findAllCoordsAroundField(x, y);
-
-        for (const [x, y] of coordsAroundField) {
-          if (isFieldInBoundaries(x, y)) {
-            foundFields.push(findFieldByCoords(fields, x, y));
-          }
-        }
-
-        foundFields.forEach((field) => field && field.bombsAround++);
+        findCoordsAround(x, y)
+          .map(([x, y]) => findFieldByCoords(fields, x, y))
+          .forEach((field) => field && field.bombsAround++);
       }
     }
 
@@ -240,7 +260,7 @@ export default function useMinesGame() {
     formattedTimer,
     gameState,
     freeFlagsCount,
-    play,
+    prepareGame,
     continuePlaying,
     pause,
     openField,

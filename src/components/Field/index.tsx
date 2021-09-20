@@ -13,7 +13,7 @@ interface IProps {
 }
 
 export default function Field({field, gameState, onOpen, onSetFlag, onDeleteFlag}: IProps) {
-  const isDisabled = gameState !== GameState.Playing;
+  const isDisabled = gameState === GameState.Pause || gameState === GameState.GameOver;
   let label: number | string = '';
 
   if (field.isOpened) {
@@ -39,13 +39,13 @@ export default function Field({field, gameState, onOpen, onSetFlag, onDeleteFlag
   });
 
   // Handlers
-  const handleClick = () => {
+  function handleClick() {
     if (!field.hasFlag) {
       onOpen(field);
     }
-  };
+  }
 
-  const handleContextMenuClick = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+  function handleContextMenuClick(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void {
     // Disable context menu
     event.preventDefault();
 
@@ -56,7 +56,7 @@ export default function Field({field, gameState, onOpen, onSetFlag, onDeleteFlag
         onSetFlag(field);
       }
     }
-  };
+  }
 
   return (
     <button className={classes} disabled={isDisabled} onClick={handleClick} onContextMenu={handleContextMenuClick}>
