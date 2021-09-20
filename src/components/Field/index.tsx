@@ -29,7 +29,6 @@ export default function Field({field, gameState, onOpen, onSetFlag, onDeleteFlag
   const classes = cn({
     [style.Field]: true,
     [style.isOpened]: field.isOpened,
-    [style.isDisabled]: isDisabled,
     [style.hasOpenedBomb]: field.isOpened && field.hasBomb,
     [style.dangerLevel1]: field.isOpened && field.bombsAround === 1,
     [style.dangerLevel2]: field.isOpened && field.bombsAround === 2,

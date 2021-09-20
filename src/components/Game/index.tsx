@@ -40,7 +40,7 @@ export default function Game() {
 
   // Event handlers
   function handlePlayButtonClick(): void {
-    play();
+    play(gameState === GameState.GameOver || gameState === GameState.Pause);
   }
 
   function handlePauseButtonClick() {

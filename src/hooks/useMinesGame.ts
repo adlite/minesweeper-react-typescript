@@ -6,6 +6,7 @@ import useInterval from './useInterval';
 export default function useMinesGame() {
   // State of the game
   const [fields, setFields] = useState<IField[]>(generateFields()); // array of game fields
+  const [fieldsOpened, setFieldsOpened] = useState<number>(0); // array of game fields which has been opened
   const [timer, setTimer] = useState<number>(0); // time in seconds spent on the game
   const [formattedTimer, setFormattedTimer] = useState<string>('00:00'); // formatted HH:MM:SS `timer`
   const [gameState, setGameState] = useState<GameState>(GameState.Idle); // current state of the game
@@ -24,10 +25,18 @@ export default function useMinesGame() {
     setFormattedTimer(formatSeconds(timer));
   }, [timer]);
 
+  // Check game win state
+  useEffect(() => {
+    if (fieldsOpened + Settings.BombsCount === Settings.FieldsCount) {
+      alert('Congratulations! You won!');
+      setGameState(GameState.GameOver);
+    }
+  }, [fieldsOpened]);
+
   // Public methods
-  function play(): void {
-    const regenerate = gameState === GameState.GameOver || gameState === GameState.Pause;
+  function play(regenerate: boolean): void {
     setFields(regenerate ? generateFields() : fields);
+    setFieldsOpened(0);
     setTimer(0);
     setGameState(GameState.Playing);
     setFreeFlagsCount(Settings.BombsCount);
@@ -42,6 +51,10 @@ export default function useMinesGame() {
   }
 
   function openField(clickedField: IField): void {
+    if (clickedField.isOpened) {
+      return;
+    }
+
     if (clickedField.hasBomb) {
       openBombsAndGameOver();
     } else if (clickedField.bombsAround === 0) {
@@ -90,8 +103,8 @@ export default function useMinesGame() {
 
   function openEmptyFields(clickedField: IField): void {
     const emptiesStack: IField[] = [clickedField];
+    const fieldIdsToOpen = new Set<number>([clickedField.id]);
     const verifiedEmptiesIds = new Set<number>();
-    const fieldIdsToOpen = new Set<number>();
 
     // Recursively check all empty fields around clicked field
     // and save their IDs into fieldIdsToOpen set
@@ -103,7 +116,7 @@ export default function useMinesGame() {
         if (isFieldInBoundaries(x, y)) {
           const sibling = findFieldByCoords(fields, x, y);
 
-          if (sibling) {
+          if (sibling && !sibling.isOpened) {
             fieldIdsToOpen.add(sibling.id);
 
             if (
@@ -127,6 +140,7 @@ export default function useMinesGame() {
 
     verifyEmptiesAround(clickedField);
 
+    setFieldsOpened(fieldsOpened + fieldIdsToOpen.size);
     setFields(
       fields.map((field) => ({
         ...field,
@@ -136,6 +150,7 @@ export default function useMinesGame() {
   }
 
   function openFieldWithBombsAround(clickedField: IField): void {
+    setFieldsOpened(fieldsOpened + 1);
     setFields(
       fields.map((field) => ({
         ...field,

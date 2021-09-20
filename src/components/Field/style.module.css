@@ -38,9 +38,9 @@
   cursor: default;
 }
 
-.isDisabled,
-.isDisabled:hover,
-.isDisabled:active {
+.Field[disabled]:not(.hasOpenedBomb),
+.Field[disabled]:not(.hasOpenedBomb):hover,
+.Field[disabled]:not(.hasOpenedBomb):active {
   cursor: default;
   background-color: var(--field-bg-disabled-color);
 }
