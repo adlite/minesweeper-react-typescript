@@ -1,0 +1,11 @@
+:root {
+  --panel-bg-color: #2b2b2b;
+  --panel-border-color: #1f1f1f;
+}
+
+.Panel {
+  border: 1px solid var(--panel-border-color);
+  border-radius: 6px;
+  background-color: var(--panel-bg-color);
+  overflow: hidden;
+}

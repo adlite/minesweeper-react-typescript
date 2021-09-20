@@ -1,12 +1,7 @@
 .Game {
-  margin: 0 auto;
   display: flex;
   justify-content: space-between;
-  max-width: 600px;
-  border: 1px solid #1f1f1f;
-  border-radius: 6px;
-  overflow: hidden;
-  background-color: #2b2b2b;
+  min-width: 600px;
 }
 
 .fields {
