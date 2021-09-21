@@ -6,29 +6,31 @@ import style from './style.module.css';
 
 interface IProps {
   field: IField;
+  isSmall: boolean;
   gameState: GameState;
   onOpen: (field: IField) => void;
   onSetFlag: (field: IField) => void;
   onDeleteFlag: (field: IField) => void;
 }
 
-function Field({field, gameState, onOpen, onSetFlag, onDeleteFlag}: IProps) {
+function Field({field, isSmall, gameState, onOpen, onSetFlag, onDeleteFlag}: IProps) {
   const isDisabled = gameState === GameState.Pause || gameState === GameState.GameOver;
   let label: number | string = '';
 
-  if (field.isOpened) {
-    if (field.hasBomb) {
-      label = '💣';
-    } else if (field.bombsAround) {
-      label = field.bombsAround;
-    }
-  } else if (field.hasFlag) {
-    label = '🚩';
+  // if (field.isOpened) {
+  if (field.hasBomb) {
+    label = '💣';
+  } else if (field.bombsAround) {
+    label = field.bombsAround;
   }
+  // } else if (field.hasFlag) {
+  //   label = '🚩';
+  // }
 
   const classes = cn({
     [style.Field]: true,
     [style.isOpened]: field.isOpened,
+    [style.isSmall]: isSmall,
     [style.hasOpenedBomb]: field.isOpened && field.hasBomb,
     [style.dangerLevel1]: field.isOpened && field.bombsAround === 1,
     [style.dangerLevel2]: field.isOpened && field.bombsAround === 2,

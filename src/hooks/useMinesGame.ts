@@ -300,6 +300,7 @@ export default function useMinesGame() {
     settings,
     setSettingsByLevel,
     fields,
+    fieldsOpened,
     timer,
     formattedTimer,
     gameState,

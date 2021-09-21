@@ -1,7 +1,6 @@
 .Game {
   display: flex;
   justify-content: space-between;
-  min-width: 600px;
 }
 
 .fields {
@@ -19,7 +18,7 @@
 
 .button {
   width: 100%;
-  padding: 20px 0;
+  padding: 10px 0;
   margin-bottom: 5px;
   color: var(--text-primary-color);
   background-color: var(--button-bg-color);
@@ -42,22 +41,24 @@
 }
 
 .stats {
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px;
   text-align: center;
 }
 
 .statBlock {
-  margin-bottom: 15px;
-}
-
-.statBlock:last-child {
-  margin-bottom: 0;
+  border: 1px solid var(--border-primary-color);
+  border-radius: 6px;
+  cursor: default;
 }
 
 .statEmoji {
-  font-size: 32px;
+  font-size: 20px;
 }
 
 .statValue {
   font-weight: bold;
-  font-size: 18px;
+  font-size: 16px;
 }

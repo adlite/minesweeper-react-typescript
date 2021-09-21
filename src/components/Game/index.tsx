@@ -3,7 +3,7 @@ import Panel from '../Panel';
 import Field from '../Field';
 import Settings from '../Settings';
 import useMinesGame from '../../hooks/useMinesGame';
-import {GameState} from '../../types';
+import {GameState, SettingsLevel} from '../../types';
 
 import style from './style.module.css';
 
@@ -12,6 +12,7 @@ export default function Game() {
     settings,
     setSettingsByLevel,
     fields,
+    fieldsOpened,
     formattedTimer,
     gameState,
     freeFlagsCount,
@@ -72,23 +73,31 @@ export default function Game() {
               onOpen={openField}
               onSetFlag={setFlag}
               onDeleteFlag={deleteFlag}
+              isSmall={settings.level !== SettingsLevel.Beginner}
             />
           ))}
         </section>
         <aside className={style.aside}>
           <div className={style.stats}>
-            <div className={style.statBlock}>
+            <div className={style.statBlock} title="Timer">
               <div className={style.statEmoji}>🕑</div>
               <div className={style.statValue}>{formattedTimer}</div>
             </div>
-            <div className={style.statBlock}>
+            <div className={style.statBlock} title="Remaining flags">
               <div className={style.statEmoji}>🚩</div>
               <div className={style.statValue}>
                 {freeFlagsCount}/{settings.bombsCount}
               </div>
             </div>
-            <div className={style.statBlock}>
-              <div className={style.statValue}>{settings.level}</div>
+            <div className={style.statBlock} title="Opened fields">
+              <div className={style.statEmoji}>✅</div>
+              <div className={style.statValue}>
+                {fieldsOpened}/{Math.pow(settings.fieldsInRow, 2) - settings.bombsCount}
+              </div>
+            </div>
+            <div className={style.statBlock} title="Bombs count">
+              <div className={style.statEmoji}>💣</div>
+              <div className={style.statValue}>{settings.bombsCount}</div>
             </div>
           </div>
           <div className={style.buttonWrapper}>
