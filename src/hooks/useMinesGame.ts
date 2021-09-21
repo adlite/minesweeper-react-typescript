@@ -1,9 +1,12 @@
-import {useEffect, useState, useCallback} from 'react';
-import {GameState, IField, Settings} from '../types';
+import {useCallback, useEffect, useState} from 'react';
+import {GameState, IField, SettingsLevel} from '../types';
 import {formatSeconds, randomNumber} from '../utils/helpers';
+import useSettings from './useSettings';
 import useInterval from './useInterval';
 
 export default function useMinesGame() {
+  // Use game settings hook
+  const {settings, setSettingsByLevel} = useSettings(SettingsLevel.Beginner);
   // Array of game fields
   const [fields, setFields] = useState<IField[]>([]);
   // Array of game fields which has been opened
@@ -24,9 +27,12 @@ export default function useMinesGame() {
   }, []);
 
   // Checks if given X and Y coordinates are in game field boundaries
-  const areCoordsInBoundaries = useCallback((x: number, y: number): boolean => {
-    return x >= 1 && x <= Settings.FieldsConstraintsX && y >= 1 && y <= Settings.FieldsConstraintsY;
-  }, []);
+  const areCoordsInBoundaries = useCallback(
+    (x: number, y: number): boolean => {
+      return x >= 1 && x <= settings.fieldsInRow && y >= 1 && y <= settings.fieldsInRow;
+    },
+    [settings],
+  );
 
   const findCoordsAround = useCallback(
     (x: number, y: number): number[][] => {
@@ -113,10 +119,10 @@ export default function useMinesGame() {
   );
 
   const generateEmptyFields = useCallback((): IField[] => {
-    return Array.from(Array(Settings.FieldsCount).keys()).map((index) => {
+    return Array.from(Array(Math.pow(settings.fieldsInRow, 2)).keys()).map((index) => {
       // Find the coordinates dependent on the index
-      const y = Math.floor(index / Settings.FieldsConstraintsY) + 1;
-      const x = (index % Settings.FieldsConstraintsX) + 1;
+      const y = Math.floor(index / settings.fieldsInRow) + 1;
+      const x = (index % settings.fieldsInRow) + 1;
       const id = index + 1;
 
       // Push basic field
@@ -129,7 +135,7 @@ export default function useMinesGame() {
         bombsAround: 0,
       };
     });
-  }, []);
+  }, [settings]);
 
   const generateFieldsWithBombs = useCallback(
     (firstClicked: IField): IField[] => {
@@ -144,11 +150,11 @@ export default function useMinesGame() {
 
       // Random recursive generator for bombs IDs
       const generateRandomBombs = () => {
-        if (fieldsWithBombsIds.size >= Settings.BombsCount) {
+        if (fieldsWithBombsIds.size >= settings.bombsCount) {
           return;
         }
 
-        const randomBombId = randomNumber(1, Settings.FieldsCount);
+        const randomBombId = randomNumber(1, Math.pow(settings.fieldsInRow, 2));
 
         if (!reservedIds.has(randomBombId)) {
           fieldsWithBombsIds.add(randomBombId);
@@ -173,7 +179,7 @@ export default function useMinesGame() {
 
       return fields;
     },
-    [findCoordsAround, findFieldByCoords, generateEmptyFields],
+    [findCoordsAround, findFieldByCoords, generateEmptyFields, settings],
   );
 
   // Public methods
@@ -182,8 +188,8 @@ export default function useMinesGame() {
     setFieldsOpened(0);
     setTimer(0);
     setGameState(GameState.Idle);
-    setFreeFlagsCount(Settings.BombsCount);
-  }, [generateEmptyFields]);
+    setFreeFlagsCount(settings.bombsCount);
+  }, [generateEmptyFields, settings]);
 
   const continuePlaying = useCallback(() => {
     setGameState(GameState.Playing);
@@ -264,6 +270,11 @@ export default function useMinesGame() {
     prepareGame();
   }, [prepareGame]);
 
+  // Regenerate game fields when settings changed
+  useEffect(() => {
+    prepareGame();
+  }, [settings, prepareGame]);
+
   // Run `setInterval` every time when `gameState` is GameState.Playing
   useInterval(
     () => {
@@ -279,13 +290,15 @@ export default function useMinesGame() {
 
   // Check game win state
   useEffect(() => {
-    if (fieldsOpened + Settings.BombsCount === Settings.FieldsCount) {
+    if (fieldsOpened + settings.bombsCount === Math.pow(settings.fieldsInRow, 2)) {
       alert('Congratulations! You won!');
       setGameState(GameState.GameOver);
     }
-  }, [fieldsOpened]);
+  }, [fieldsOpened, settings]);
 
   return {
+    settings,
+    setSettingsByLevel,
     fields,
     timer,
     formattedTimer,

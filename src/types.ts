@@ -13,16 +13,9 @@ export interface IField {
 }
 
 export interface ISettings {
-  xFieldsCount: number;
-  yFieldsCount: number;
+  level: SettingsLevel;
+  fieldsInRow: number;
   bombsCount: number;
-}
-
-export enum Settings {
-  FieldsCount = 64,
-  FieldsConstraintsX = 8,
-  FieldsConstraintsY = 8,
-  BombsCount = 10,
 }
 
 export enum SettingsLevel {
