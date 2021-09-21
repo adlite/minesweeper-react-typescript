@@ -1,6 +1,12 @@
 .App {
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: stretch;
   height: 100vh;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }

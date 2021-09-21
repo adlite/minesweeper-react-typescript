@@ -1,0 +1,29 @@
+.Settings {
+  padding: 10px;
+  margin-bottom: 15px;
+}
+
+.button {
+  margin-right: 10px;
+  padding: 10px 15px;
+  border: none;
+  color: var(--text-primary-color);
+  border-radius: 6px;
+  background-color: transparent;
+  cursor: pointer;
+  transition: background-color 200ms;
+}
+
+.button:last-child {
+  margin-right: 0;
+}
+
+.button:not(.isActive):hover {
+  background-color: var(--button-bg-active-color);
+}
+
+.button.isActive {
+  background-color: var(--button-bg-active-color);
+  cursor: default;
+  font-weight: bold;
+}

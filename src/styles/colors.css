@@ -3,4 +3,8 @@
   --bg-primary-color: #3c3f41;
   --bg-secondary-color: #3c3f41;
   --border-primary-color: #1f1f1f;
+  --button-bg-color: #54595b;
+  --button-bg-hover-color: #6a7173;
+  --button-bg-active-color: #3c3f41;
+  --button-border-color: #2b2b2b;
 }

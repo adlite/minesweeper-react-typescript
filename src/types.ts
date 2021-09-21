@@ -12,11 +12,23 @@ export interface IField {
   bombsAround: number;
 }
 
+export interface ISettings {
+  xFieldsCount: number;
+  yFieldsCount: number;
+  bombsCount: number;
+}
+
 export enum Settings {
   FieldsCount = 64,
   FieldsConstraintsX = 8,
   FieldsConstraintsY = 8,
   BombsCount = 10,
+}
+
+export enum SettingsLevel {
+  Beginner = 'Beginner',
+  Intermediate = 'Intermediate',
+  Expert = 'Expert',
 }
 
 export enum GameState {

@@ -8,6 +8,6 @@ interface IProps {
   className?: string;
 }
 
-export default function Field({className = '', children}: IProps) {
+export default function Panel({className = '', children}: IProps) {
   return <div className={cn(style.Panel, className)}>{children}</div>;
 }
