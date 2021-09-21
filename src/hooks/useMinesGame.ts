@@ -1,16 +1,22 @@
-import {useEffect, useState} from 'react';
+import {useEffect, useState, useMemo} from 'react';
 import {GameState, IField, Settings} from '../types';
 import {formatSeconds, randomNumber} from '../utils/helpers';
 import useInterval from './useInterval';
 
 export default function useMinesGame() {
-  // State of the game
-  const [fields, setFields] = useState<IField[]>(generateEmptyFields()); // array of game fields
-  const [fieldsOpened, setFieldsOpened] = useState<number>(0); // array of game fields which has been opened
-  const [timer, setTimer] = useState<number>(0); // time in seconds spent on the game
-  const [formattedTimer, setFormattedTimer] = useState<string>('00:00'); // formatted HH:MM:SS `timer`
-  const [gameState, setGameState] = useState<GameState>(GameState.Idle); // current state of the game
-  const [freeFlagsCount, setFreeFlagsCount] = useState<number>(10); // the number of flags remaining with the player
+  // Array of game fields
+  const initialFields = useMemo(() => generateEmptyFields(), []);
+  const [fields, setFields] = useState<IField[]>(initialFields);
+  // Array of game fields which has been opened
+  const [fieldsOpened, setFieldsOpened] = useState<number>(0);
+  // Time in seconds spent on the game
+  const [timer, setTimer] = useState<number>(0);
+  // Formatted HH:MM:SS `timer`
+  const [formattedTimer, setFormattedTimer] = useState<string>('00:00');
+  // Current state of the game
+  const [gameState, setGameState] = useState<GameState>(GameState.Idle);
+  // The number of flags remaining with the player
+  const [freeFlagsCount, setFreeFlagsCount] = useState<number>(10);
 
   // Run `setInterval` every time when `gameState` is GameState.Playing
   useInterval(

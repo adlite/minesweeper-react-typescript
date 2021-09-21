@@ -1,12 +1,16 @@
-import React from 'react';
+import React, {useEffect, useMemo} from 'react';
 import Panel from '../Panel';
 import Field from '../Field';
 import useMinesGame from '../../hooks/useMinesGame';
-import {GameState, Settings} from '../../types';
+import {GameState, Settings, SettingsLevel} from '../../types';
 
 import style from './style.module.css';
 
-export default function Game() {
+interface IProps {
+  settingsLevel: SettingsLevel;
+}
+
+export default function Game({settingsLevel}: IProps) {
   const {
     fields,
     formattedTimer,
@@ -73,6 +77,9 @@ export default function Game() {
             <div className={style.statValue}>
               {freeFlagsCount}/{Settings.BombsCount}
             </div>
+          </div>
+          <div className={style.statBlock}>
+            <div className={style.statValue}>{settingsLevel}</div>
           </div>
         </div>
         <div className={style.buttonWrapper}>

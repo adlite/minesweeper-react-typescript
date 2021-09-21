@@ -25,5 +25,4 @@
 .button.isActive {
   background-color: var(--button-bg-active-color);
   cursor: default;
-  font-weight: bold;
 }
