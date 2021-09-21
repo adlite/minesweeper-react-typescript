@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo} from 'react';
+import React from 'react';
 import Panel from '../Panel';
 import Field from '../Field';
 import useMinesGame from '../../hooks/useMinesGame';

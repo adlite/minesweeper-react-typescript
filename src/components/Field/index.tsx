@@ -49,7 +49,7 @@ export default function Field({field, gameState, onOpen, onSetFlag, onDeleteFlag
     // Disable context menu
     event.preventDefault();
 
-    if (gameState === GameState.Playing) {
+    if (gameState === GameState.Playing && !field.isOpened) {
       if (field.hasFlag) {
         onDeleteFlag(field);
       } else {
