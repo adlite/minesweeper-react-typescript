@@ -12,7 +12,7 @@ interface IProps {
   onDeleteFlag: (field: IField) => void;
 }
 
-export default function Field({field, gameState, onOpen, onSetFlag, onDeleteFlag}: IProps) {
+function Field({field, gameState, onOpen, onSetFlag, onDeleteFlag}: IProps) {
   const isDisabled = gameState === GameState.Pause || gameState === GameState.GameOver;
   let label: number | string = '';
 
@@ -64,3 +64,5 @@ export default function Field({field, gameState, onOpen, onSetFlag, onDeleteFlag
     </button>
   );
 }
+
+export default React.memo(Field);
