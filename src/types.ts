@@ -1,11 +1,9 @@
-export interface ICoords {
-  y: number;
-  x: number;
-}
+export type FieldCoords = [number, number];
+export type FieldsMap = Map<string, IField>;
 
 export interface IField {
   id: number;
-  coords: ICoords;
+  coords: FieldCoords;
   isOpened: boolean;
   hasBomb: boolean;
   hasFlag: boolean;
@@ -14,8 +12,10 @@ export interface IField {
 
 export interface ISettings {
   level: SettingsLevel;
-  fieldsInRow: number;
+  fieldsInRow: number; // TODO: remove it
   bombsCount: number;
+  xFieldsCount: number;
+  yFieldsCount: number;
 }
 
 export enum SettingsLevel {

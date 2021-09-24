@@ -17,15 +17,15 @@ function Field({field, isSmall, gameState, onOpen, onSetFlag, onDeleteFlag}: IPr
   const isDisabled = gameState === GameState.Pause || gameState === GameState.GameOver;
   let label: number | string = '';
 
-  if (field.isOpened) {
-    if (field.hasBomb) {
-      label = '💣';
-    } else if (field.bombsAround) {
-      label = field.bombsAround;
-    }
-  } else if (field.hasFlag) {
-    label = '🚩';
+  // if (field.isOpened) {
+  if (field.hasBomb) {
+    label = '💣';
+  } else if (field.bombsAround) {
+    label = field.bombsAround;
   }
+  // } else if (field.hasFlag) {
+  //   label = '🚩';
+  // }
 
   const classes = cn({
     [style.Field]: true,
