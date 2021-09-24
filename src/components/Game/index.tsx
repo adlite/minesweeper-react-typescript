@@ -8,7 +8,7 @@ import {GameState, SettingsLevel} from '../../types';
 import style from './style.module.css';
 
 export default function Game() {
-  const {settings, setSettingsByLevel, fields, prepareGame, openField} = useGame();
+  const {settings, setSettingsByLevel, fields, openField} = useGame();
 
   const fieldsStyle = useMemo(
     () => ({

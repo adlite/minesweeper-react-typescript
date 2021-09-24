@@ -3,47 +3,7 @@ import {IField, SettingsLevel, FieldsMap, FieldCoords} from '../types';
 import useSettings from './useSettings';
 import {randomNumber} from '../utils/helpers';
 
-// function generateFieldsWithBombs(firstClicked: IField): FieldsMap {
-//   const fields: FieldsMap = generateEmptyFields();
-//   const fieldsWithBombsIds: Set<number> = new Set();
-//
-//   // Generate reserved fields which can't have bombs due to the first clicked field
-//   const reservedIdsAround = findCoordsAround(firstClicked.coords.x, firstClicked.coords.y).map(
-//     ([x, y]) => findFieldByCoords(fields, x, y)?.id as number,
-//   );
-//   const reservedIds = new Set<number>([firstClicked.id, ...reservedIdsAround]);
-//
-//   // Random recursive generator for bombs IDs
-//   const generateRandomBombs = () => {
-//     if (fieldsWithBombsIds.size >= settings.bombsCount) {
-//       return;
-//     }
-//
-//     const randomBombId = randomNumber(1, Math.pow(settings.fieldsInRow, 2));
-//
-//     if (!reservedIds.has(randomBombId)) {
-//       fieldsWithBombsIds.add(randomBombId);
-//     }
-//
-//     // Jump into new recursion
-//     generateRandomBombs();
-//   };
-//
-//   generateRandomBombs();
-//
-//   for (const field of fields) {
-//     field.hasBomb = fieldsWithBombsIds.has(field.id);
-//
-//     if (field.hasBomb) {
-//       const {x, y} = field.coords;
-//       findCoordsAround(x, y)
-//         .map(([x, y]) => findFieldByCoords(fields, x, y))
-//         .forEach((field) => field && field.bombsAround++);
-//     }
-//   }
-//
-//   return fields;
-// };
+let cycles = 0; // TODO: remove counter
 
 function coordsToString([x, y]: FieldCoords) {
   return `[${x},${y}]`;
@@ -79,7 +39,12 @@ export default function useGame() {
         [x + 1, y + 1],
       ];
 
-      return coords.filter(([x, y]) => areCoordsInBoundaries([x, y])) as FieldCoords[];
+      cycles += 1;
+
+      return coords.filter(([x, y]) => {
+        cycles += 1;
+        return areCoordsInBoundaries([x, y]);
+      }) as FieldCoords[];
     },
     [areCoordsInBoundaries],
   );
@@ -98,6 +63,7 @@ export default function useGame() {
           hasFlag: false,
           bombsAround: 0,
         });
+        cycles += 1;
       }
     }
 
@@ -110,13 +76,15 @@ export default function useGame() {
       const fieldsWithBombsIds: Set<number> = new Set();
 
       // Generate reserved fields which can't have bombs due to the first clicked field
-      const reservedIdsAround = findCoordsAround(firstClicked.coords).map(
-        (coords) => fields.get(coordsToString(coords))?.id as number,
-      );
+      const reservedIdsAround = findCoordsAround(firstClicked.coords).map((coords) => {
+        cycles += 1;
+        return fields.get(coordsToString(coords))?.id as number;
+      });
       const reservedIds = new Set<number>([firstClicked.id, ...reservedIdsAround]);
 
       // Random recursive generator for bombs IDs
       while (fieldsWithBombsIds.size < settings.bombsCount) {
+        cycles += 1;
         const randomBombId = randomNumber(1, settings.xFieldsCount * settings.yFieldsCount);
 
         if (!reservedIds.has(randomBombId)) {
@@ -125,12 +93,19 @@ export default function useGame() {
       }
 
       for (const field of fields.values()) {
+        cycles += 1;
         field.hasBomb = fieldsWithBombsIds.has(field.id);
 
         if (field.hasBomb) {
           findCoordsAround(field.coords)
-            .map((coords) => fields.get(coordsToString(coords)))
-            .forEach((field) => field && field.bombsAround++);
+            .map((coords) => {
+              cycles += 1;
+              return fields.get(coordsToString(coords));
+            })
+            .forEach((field) => {
+              cycles += 1;
+              return field && field.bombsAround++;
+            });
         }
       }
 
@@ -154,7 +129,7 @@ export default function useGame() {
         setFields(generateFieldsWithBombs(clickedField));
       }
     },
-    [fieldsOpened],
+    [fieldsOpened, generateFieldsWithBombs],
   );
 
   // Initialize game on mount
@@ -166,6 +141,9 @@ export default function useGame() {
   useEffect(() => {
     prepareGame();
   }, [settings, prepareGame]);
+
+  // Debug cycles counter
+  useEffect(() => console.log(cycles));
 
   return {
     settings,
