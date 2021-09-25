@@ -2,8 +2,10 @@ import {useCallback, useEffect, useState} from 'react';
 import {IField, FieldsMap, FieldCoords, ISettings} from '../types';
 import {randomNumber} from '../utils/helpers';
 
-let cycles = 0; // Debug cycles counter
+// Debug cycles counter
+let cycles = 0;
 
+// Changes field coords into convenient Map key
 function coordsToKey([x, y]: FieldCoords): string {
   return `[${x},${y}]`;
 }
@@ -35,8 +37,6 @@ export default function useGame(settings: ISettings) {
         [x, y + 1],
         [x + 1, y + 1],
       ];
-
-      cycles += 1;
 
       return coords.filter(([x, y]) => {
         cycles += 1;
