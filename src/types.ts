@@ -12,7 +12,6 @@ export interface IField {
 
 export interface ISettings {
   level: SettingsLevel;
-  fieldsInRow: number; // TODO: remove it
   bombsCount: number;
   xFieldsCount: number;
   yFieldsCount: number;

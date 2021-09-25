@@ -1,17 +1,14 @@
 import {useCallback, useEffect, useState} from 'react';
-import {IField, SettingsLevel, FieldsMap, FieldCoords} from '../types';
-import useSettings from './useSettings';
+import {IField, FieldsMap, FieldCoords, ISettings} from '../types';
 import {randomNumber} from '../utils/helpers';
 
-let cycles = 0; // TODO: remove counter
+let cycles = 0; // TODO: Debug cycles counter
 
 function coordsToString([x, y]: FieldCoords): string {
   return `[${x},${y}]`;
 }
 
-export default function useGame() {
-  // Use game settings hook
-  const {settings, setSettingsByLevel} = useSettings(SettingsLevel.Beginner);
+export default function useGame(settings: ISettings) {
   // Array of game fields
   const [fields, setFields] = useState<FieldsMap>(new Map());
   // Array of game fields which has been opened
@@ -54,6 +51,7 @@ export default function useGame() {
 
     for (let y = 0; y < settings.yFieldsCount; y++) {
       for (let x = 0; x < settings.xFieldsCount; x++) {
+        cycles += 1;
         const coords: FieldCoords = [x + 1, y + 1];
         fields.set(coordsToString(coords), {
           id: x + 1 + settings.xFieldsCount * y,
@@ -63,7 +61,6 @@ export default function useGame() {
           hasFlag: false,
           bombsAround: 0,
         });
-        cycles += 1;
       }
     }
 
@@ -170,8 +167,10 @@ export default function useGame() {
   const openFieldWithBombsAround = useCallback(
     (clickedField: IField): void => {
       for (const field of fields.values()) {
+        cycles += 1;
         if (clickedField.id === field.id) {
           field.isOpened = true;
+          break;
         }
       }
 
@@ -182,7 +181,9 @@ export default function useGame() {
   );
 
   const openAllBombs = useCallback((): void => {
+    // TODO: add conditional break
     for (const field of fields.values()) {
+      cycles += 1;
       if (field.hasBomb) {
         field.isOpened = true;
       }
@@ -192,8 +193,9 @@ export default function useGame() {
   }, [fields]);
 
   // Public methods
-  const prepareGame = useCallback(() => {
+  const initFields = useCallback(() => {
     setFields(generateEmptyFields());
+    setFieldsOpened(0);
   }, [generateEmptyFields]);
 
   // Main public handler for field click
@@ -221,25 +223,16 @@ export default function useGame() {
     [fields, fieldsOpened, generateFieldsWithBombs, openEmptyFields, openAllBombs, openFieldWithBombsAround],
   );
 
-  // Initialize game on mount
+  // Update debug cycles counter on every fields change
   useEffect(() => {
-    prepareGame();
-  }, [prepareGame]);
-
-  // Regenerate game fields when settings changed
-  useEffect(() => {
-    prepareGame();
-  }, [settings, prepareGame]);
-
-  // Debug cycles counter
-  useEffect(() => console.log(`Cycles count: ${cycles}`));
+    console.log(`Cycles count: ${cycles}`);
+    cycles = 0;
+  }, [fields]);
 
   return {
-    settings,
-    setSettingsByLevel,
     fields,
     fieldsOpened,
     openField,
-    prepareGame,
+    initFields,
   };
 }
