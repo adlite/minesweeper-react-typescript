@@ -82,7 +82,7 @@ export default function useGame() {
       });
       const reservedIds = new Set<number>([firstClicked.id, ...reservedIdsAround]);
 
-      // Random recursive generator for bombs IDs
+      // Random generator for bombs IDs
       while (fieldsWithBombsIds.size < settings.bombsCount) {
         cycles += 1;
         const randomBombId = randomNumber(1, settings.xFieldsCount * settings.yFieldsCount);
@@ -129,7 +129,7 @@ export default function useGame() {
       }
 
       // Recursively check all empty fields around clicked field
-      // and save their IDs into fieldIdsToOpen set
+      // and change their `isOpened` flag
       const verifyEmptiesAround = (field: IField) => {
         const coordsAround = findCoordsAround(field.coords);
 
@@ -162,27 +162,63 @@ export default function useGame() {
       verifyEmptiesAround(clickedField);
 
       setFields(new Map(fields));
-      setFieldsOpened(opened);
+      setFieldsOpened(fieldsOpened + opened);
     },
-    [findCoordsAround],
+    [findCoordsAround, fieldsOpened],
   );
+
+  const openFieldWithBombsAround = useCallback(
+    (clickedField: IField): void => {
+      for (const field of fields.values()) {
+        if (clickedField.id === field.id) {
+          field.isOpened = true;
+        }
+      }
+
+      setFields(new Map(fields));
+      setFieldsOpened(fieldsOpened + 1);
+    },
+    [fields, fieldsOpened],
+  );
+
+  const openAllBombs = useCallback((): void => {
+    for (const field of fields.values()) {
+      if (field.hasBomb) {
+        field.isOpened = true;
+      }
+    }
+
+    setFields(new Map(fields));
+  }, [fields]);
 
   // Public methods
   const prepareGame = useCallback(() => {
     setFields(generateEmptyFields());
   }, [generateEmptyFields]);
 
+  // Main public handler for field click
   const openField = useCallback(
     (clickedField: IField) => {
       if (clickedField.isOpened) {
         return;
       }
 
-      if (fieldsOpened === 0) {
+      if (clickedField.hasBomb) {
+        // Handle click on field with bomb
+        openAllBombs();
+      } else if (fieldsOpened === 0) {
+        // Handle first click.
+        // Regenerate fields with bombs and then open fields around first clicked field.
+        // The first click in any game will never be a mine.
         openEmptyFields(clickedField, generateFieldsWithBombs(clickedField));
+      } else if (clickedField.bombsAround === 0) {
+        // Handle click on empty field and open fields around it.
+        openEmptyFields(clickedField, fields);
+      } else {
+        openFieldWithBombsAround(clickedField);
       }
     },
-    [fieldsOpened, generateFieldsWithBombs, openEmptyFields],
+    [fields, fieldsOpened, generateFieldsWithBombs, openEmptyFields, openAllBombs, openFieldWithBombsAround],
   );
 
   // Initialize game on mount

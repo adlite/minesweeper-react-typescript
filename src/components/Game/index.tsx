@@ -50,7 +50,7 @@ export default function Game() {
             <div className={style.statBlock} title="Opened fields">
               <div className={style.statEmoji}>✅</div>
               <div className={style.statValue}>
-                {fieldsOpened}/{Math.pow(settings.fieldsInRow, 2) - settings.bombsCount}
+                {fieldsOpened}/{settings.xFieldsCount * settings.yFieldsCount - settings.bombsCount}
               </div>
             </div>
             <div className={style.statBlock} title="Bombs count">
