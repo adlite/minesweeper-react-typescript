@@ -21,6 +21,7 @@ export enum SettingsLevel {
   Beginner = 'Beginner',
   Intermediate = 'Intermediate',
   Expert = 'Expert',
+  SuperExpert = 'SuperExpert',
 }
 
 export enum GameState {

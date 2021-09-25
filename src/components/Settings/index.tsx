@@ -2,6 +2,7 @@ import React, {useCallback} from 'react';
 import cn from 'classnames';
 
 import Panel from '../Panel';
+import {settings} from '../../hooks/useSettings';
 import {SettingsLevel} from '../../types';
 import style from './style.module.css';
 
@@ -19,24 +20,15 @@ function Settings({className = '', level, onLevelChange}: IProps) {
 
   return (
     <Panel className={cn(style.Settings, className)}>
-      <button
-        className={cn(style.button, {[style.isActive]: level === SettingsLevel.Beginner})}
-        onClick={handleLevelChange(SettingsLevel.Beginner)}
-      >
-        Beginner
-      </button>
-      <button
-        className={cn(style.button, {[style.isActive]: level === SettingsLevel.Intermediate})}
-        onClick={handleLevelChange(SettingsLevel.Intermediate)}
-      >
-        Intermediate
-      </button>
-      <button
-        className={cn(style.button, {[style.isActive]: level === SettingsLevel.Expert})}
-        onClick={handleLevelChange(SettingsLevel.Expert)}
-      >
-        Expert
-      </button>
+      {settings.map((s) => (
+        <button
+          key={s.level}
+          className={cn(style.button, {[style.isActive]: level === s.level})}
+          onClick={handleLevelChange(s.level)}
+        >
+          {s.level}
+        </button>
+      ))}
     </Panel>
   );
 }
