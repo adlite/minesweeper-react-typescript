@@ -4,7 +4,7 @@ import {randomNumber} from '../utils/helpers';
 
 let cycles = 0; // Debug cycles counter
 
-function coordsToString([x, y]: FieldCoords): string {
+function coordsToKey([x, y]: FieldCoords): string {
   return `[${x},${y}]`;
 }
 
@@ -53,7 +53,7 @@ export default function useGame(settings: ISettings) {
       for (let x = 0; x < settings.xFieldsCount; x++) {
         cycles += 1;
         const coords: FieldCoords = [x + 1, y + 1];
-        fields.set(coordsToString(coords), {
+        fields.set(coordsToKey(coords), {
           id: x + 1 + settings.xFieldsCount * y,
           coords,
           isOpened: false,
@@ -75,7 +75,7 @@ export default function useGame(settings: ISettings) {
       // Generate reserved fields which can't have bombs due to the first clicked field
       const reservedIdsAround = findCoordsAround(firstClicked.coords).map((coords) => {
         cycles += 1;
-        return fields.get(coordsToString(coords))?.id as number;
+        return fields.get(coordsToKey(coords))?.id as number;
       });
       const reservedIds = new Set<number>([firstClicked.id, ...reservedIdsAround]);
 
@@ -97,7 +97,7 @@ export default function useGame(settings: ISettings) {
           findCoordsAround(field.coords)
             .map((coords) => {
               cycles += 1;
-              return fields.get(coordsToString(coords));
+              return fields.get(coordsToKey(coords));
             })
             .forEach((field) => {
               cycles += 1;
@@ -118,7 +118,7 @@ export default function useGame(settings: ISettings) {
       let opened = 0;
 
       // Open currently clicked field
-      const clickedFieldToOpen = fields.get(coordsToString(clickedField.coords));
+      const clickedFieldToOpen = fields.get(coordsToKey(clickedField.coords));
 
       if (clickedFieldToOpen) {
         clickedFieldToOpen.isOpened = true;
@@ -132,7 +132,7 @@ export default function useGame(settings: ISettings) {
 
         for (const coords of coordsAround) {
           cycles += 1;
-          const sibling = fields.get(coordsToString(coords));
+          const sibling = fields.get(coordsToKey(coords));
 
           if (sibling && !sibling.isOpened) {
             sibling.isOpened = true;
