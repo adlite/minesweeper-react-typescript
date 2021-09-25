@@ -181,16 +181,20 @@ export default function useGame(settings: ISettings) {
   );
 
   const openAllBombs = useCallback((): void => {
-    // TODO: add conditional break
+    let opened = 0;
     for (const field of fields.values()) {
       cycles += 1;
       if (field.hasBomb) {
         field.isOpened = true;
+        opened += 1;
+      }
+      if (opened >= settings.bombsCount) {
+        break;
       }
     }
 
     setFields(new Map(fields));
-  }, [fields]);
+  }, [fields, settings]);
 
   // Public methods
   const initFields = useCallback(() => {

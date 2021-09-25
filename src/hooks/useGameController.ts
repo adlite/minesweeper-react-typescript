@@ -92,7 +92,6 @@ export default function useGameController() {
     formattedTimer,
     gameState,
     freeFlagsCount,
-    setFreeFlagsCount,
     prepareGame,
     continuePlaying,
     pause,

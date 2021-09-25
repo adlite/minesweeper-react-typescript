@@ -20,7 +20,6 @@ export default function Game() {
     pause,
     gameState,
     freeFlagsCount,
-    setFreeFlagsCount,
   } = useGameController();
 
   // Button labels getters
@@ -69,10 +68,10 @@ export default function Game() {
             <Field
               key={field.id}
               field={field}
-              gameState={GameState.Playing}
+              gameState={gameState}
               onOpen={onFieldOpen}
-              onSetFlag={console.log} // TODO: replace with state
-              onDeleteFlag={console.log} // TODO: replace with state
+              onSetFlag={console.log}
+              onDeleteFlag={console.log}
               isSmall={settings.level !== SettingsLevel.Beginner}
             />
           ))}

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import cn from 'classnames';
 import {GameState, IField} from '../../types';
 
@@ -17,15 +17,15 @@ function Field({field, isSmall, gameState, onOpen, onSetFlag, onDeleteFlag}: IPr
   const isDisabled = gameState === GameState.Pause || gameState === GameState.GameOver;
   let label: number | string = '';
 
-  // if (field.isOpened) {
-  if (field.hasBomb) {
-    label = '💣';
-  } else if (field.bombsAround) {
-    label = field.bombsAround;
+  if (field.isOpened) {
+    if (field.hasBomb) {
+      label = '💣';
+    } else if (field.bombsAround) {
+      label = field.bombsAround;
+    }
+  } else if (field.hasFlag) {
+    label = '🚩';
   }
-  // } else if (field.hasFlag) {
-  //   label = '🚩';
-  // }
 
   const classes = cn({
     [style.Field]: true,
@@ -41,24 +41,27 @@ function Field({field, isSmall, gameState, onOpen, onSetFlag, onDeleteFlag}: IPr
   });
 
   // Handlers
-  function handleClick() {
+  const handleClick = useCallback(() => {
     if (!field.hasFlag) {
       onOpen(field);
     }
-  }
+  }, [field, onOpen]);
 
-  function handleContextMenuClick(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void {
-    // Disable context menu
-    event.preventDefault();
+  const handleContextMenuClick = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+      // Disable context menu
+      event.preventDefault();
 
-    if (gameState === GameState.Playing && !field.isOpened) {
-      if (field.hasFlag) {
-        onDeleteFlag(field);
-      } else {
-        onSetFlag(field);
+      if (gameState === GameState.Playing && !field.isOpened) {
+        if (field.hasFlag) {
+          onDeleteFlag(field);
+        } else {
+          onSetFlag(field);
+        }
       }
-    }
-  }
+    },
+    [field, gameState, onSetFlag, onDeleteFlag],
+  );
 
   return (
     <button className={classes} disabled={isDisabled} onClick={handleClick} onContextMenu={handleContextMenuClick}>
