@@ -24,7 +24,7 @@ export default function Game() {
   } = useGameController();
 
   // Button labels getters
-  const getPlayButtonLabel = useCallback(() => {
+  const playButtonLabel = useMemo(() => {
     switch (gameState) {
       case GameState.Idle:
         return 'Play';
@@ -33,7 +33,7 @@ export default function Game() {
     }
   }, [gameState]);
 
-  const getPauseButtonLabel = useCallback(() => {
+  const pauseButtonLabel = useMemo(() => {
     switch (gameState) {
       case GameState.Pause:
         return 'Continue';
@@ -41,6 +41,15 @@ export default function Game() {
         return 'Pause';
     }
   }, [gameState]);
+
+  // Grid styles for specific settings
+  const fieldsStyle = useMemo(
+    () => ({
+      gridTemplateColumns: `repeat(${settings.xFieldsCount}, 1fr)`,
+      gridTemplateRows: `repeat(${settings.yFieldsCount}, 1fr)`,
+    }),
+    [settings],
+  );
 
   // Event handlers
   const handlePauseButtonClick = useCallback(() => {
@@ -50,14 +59,6 @@ export default function Game() {
       pause();
     }
   }, [gameState, pause, continuePlaying]);
-
-  const fieldsStyle = useMemo(
-    () => ({
-      gridTemplateColumns: `repeat(${settings.xFieldsCount}, 1fr)`,
-      gridTemplateRows: `repeat(${settings.yFieldsCount}, 1fr)`,
-    }),
-    [settings],
-  );
 
   return (
     <>
@@ -102,12 +103,12 @@ export default function Game() {
           <div className={style.buttonWrapper}>
             {gameState === GameState.Playing || gameState === GameState.Idle || (
               <button className={style.button} onClick={prepareGame}>
-                {getPlayButtonLabel()}
+                {playButtonLabel}
               </button>
             )}
             {(gameState === GameState.Playing || gameState === GameState.Pause) && (
               <button className={style.button} onClick={handlePauseButtonClick}>
-                {getPauseButtonLabel()}
+                {pauseButtonLabel}
               </button>
             )}
           </div>
