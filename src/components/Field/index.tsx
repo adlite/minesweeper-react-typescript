@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback} from 'react';
 import cn from 'classnames';
 import {GameState, IField} from '../../types';
 
@@ -9,18 +9,11 @@ interface IProps {
   isSmall: boolean;
   gameState: GameState;
   onOpen: (field: IField) => void;
+  onSetFlag: (field: IField) => void;
+  onDeleteFlag: (field: IField) => void;
 }
 
-function Field({field, isSmall, gameState, onOpen}: IProps) {
-  const [hasFlag, setFlag] = useState<boolean>(false);
-
-  // Delete flag when new game started
-  useEffect(() => {
-    if (gameState === GameState.Idle && hasFlag) {
-      setFlag(false);
-    }
-  }, [gameState, hasFlag]);
-
+function Field({field, isSmall, gameState, onOpen, onSetFlag, onDeleteFlag}: IProps) {
   const isDisabled = gameState === GameState.Pause || gameState === GameState.GameOver;
   let label: number | string = '';
 
@@ -30,7 +23,7 @@ function Field({field, isSmall, gameState, onOpen}: IProps) {
     } else if (field.bombsAround) {
       label = field.bombsAround;
     }
-  } else if (hasFlag) {
+  } else if (field.hasFlag) {
     label = '🚩';
   }
 
@@ -49,10 +42,10 @@ function Field({field, isSmall, gameState, onOpen}: IProps) {
 
   // Handlers
   const handleClick = useCallback(() => {
-    if (!hasFlag) {
+    if (!field.hasFlag) {
       onOpen(field);
     }
-  }, [field, onOpen, hasFlag]);
+  }, [field, onOpen]);
 
   const handleContextMenuClick = useCallback(
     (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -60,14 +53,14 @@ function Field({field, isSmall, gameState, onOpen}: IProps) {
       event.preventDefault();
 
       if (gameState === GameState.Playing && !field.isOpened) {
-        if (hasFlag) {
-          setFlag(false);
+        if (field.hasFlag) {
+          onDeleteFlag(field);
         } else {
-          setFlag(true);
+          onSetFlag(field);
         }
       }
     },
-    [field, gameState, hasFlag],
+    [field, onSetFlag, onDeleteFlag, gameState],
   );
 
   return (

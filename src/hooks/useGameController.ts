@@ -9,7 +9,7 @@ export default function useGameController() {
   // Use game settings hook
   const {settings, setSettingsByLevel} = useSettings(SettingsLevel.Beginner);
   // Game main logic hook
-  const {fields, fieldsOpened, openField, initFields} = useGame(settings);
+  const {fields, fieldsOpened, openField, initFields, flagsCount, setFlag, deleteFlag} = useGame(settings);
   // Time in seconds spent on the game
   const [timer, setTimer] = useState<number>(0);
   // Formatted HH:MM:SS `timer`
@@ -92,5 +92,8 @@ export default function useGameController() {
     continuePlaying,
     pause,
     onFieldOpen,
+    flagsCount,
+    setFlag,
+    deleteFlag,
   };
 }

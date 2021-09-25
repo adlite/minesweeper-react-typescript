@@ -1,0 +1,14 @@
+.Statistics {
+  border: 1px solid var(--border-primary-color);
+  border-radius: 6px;
+  cursor: default;
+}
+
+.emoji {
+  font-size: 20px;
+}
+
+.value {
+  font-weight: bold;
+  font-size: 16px;
+}

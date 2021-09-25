@@ -15,6 +15,8 @@ export default function useGame(settings: ISettings) {
   const [fields, setFields] = useState<FieldsMap>(new Map());
   // Array of game fields which has been opened
   const [fieldsOpened, setFieldsOpened] = useState<number>(0);
+  // Flags count
+  const [flagsCount, setFlagsCount] = useState<number>(0);
 
   // Private methods
   // Checks if given X and Y coordinates are in game field boundaries
@@ -95,10 +97,12 @@ export default function useGame(settings: ISettings) {
 
         if (field.hasBomb) {
           findCoordsAround(field.coords)
+            // eslint-disable-next-line no-loop-func
             .map((coords) => {
               cycles += 1;
               return fields.get(coordsToKey(coords));
             })
+            // eslint-disable-next-line no-loop-func
             .forEach((field) => {
               cycles += 1;
               return field && field.bombsAround++;
@@ -116,6 +120,7 @@ export default function useGame(settings: ISettings) {
       const emptiesStack: IField[] = [clickedField];
       const verifiedEmptiesIds = new Set<number>();
       let opened = 0;
+      let deletedFlags = 0;
 
       // Open currently clicked field
       const clickedFieldToOpen = fields.get(coordsToKey(clickedField.coords));
@@ -138,6 +143,11 @@ export default function useGame(settings: ISettings) {
             sibling.isOpened = true;
             opened += 1;
 
+            if (sibling.hasFlag) {
+              sibling.hasFlag = false;
+              deletedFlags += 1;
+            }
+
             if (
               sibling.bombsAround === 0 &&
               !emptiesStack.find(({id}) => id === sibling.id) &&
@@ -158,10 +168,14 @@ export default function useGame(settings: ISettings) {
 
       verifyEmptiesAround(clickedField);
 
+      if (deletedFlags) {
+        setFlagsCount(flagsCount - deletedFlags);
+      }
+
       setFields(new Map(fields));
       setFieldsOpened(fieldsOpened + opened);
     },
-    [findCoordsAround, fieldsOpened],
+    [findCoordsAround, fieldsOpened, flagsCount],
   );
 
   const openFieldWithBombsAround = useCallback(
@@ -196,10 +210,27 @@ export default function useGame(settings: ISettings) {
     setFields(new Map(fields));
   }, [fields, settings]);
 
+  const setFlagValue = useCallback(
+    (clickedField: IField, value: boolean) => {
+      for (const field of fields.values()) {
+        cycles += 1;
+        if (clickedField.id === field.id) {
+          field.hasFlag = value;
+          break;
+        }
+      }
+
+      setFields(new Map(fields));
+      setFlagsCount(value ? flagsCount + 1 : flagsCount - 1);
+    },
+    [fields, flagsCount],
+  );
+
   // Public methods
   const initFields = useCallback(() => {
     setFields(generateEmptyFields());
     setFieldsOpened(0);
+    setFlagsCount(0);
   }, [generateEmptyFields]);
 
   // Main public handler for field click
@@ -227,6 +258,28 @@ export default function useGame(settings: ISettings) {
     [fields, fieldsOpened, generateFieldsWithBombs, openEmptyFields, openAllBombs, openFieldWithBombsAround],
   );
 
+  const setFlag = useCallback(
+    (clickedField: IField) => {
+      if (flagsCount >= settings.bombsCount) {
+        return;
+      }
+
+      setFlagValue(clickedField, true);
+    },
+    [setFlagValue, flagsCount, settings],
+  );
+
+  const deleteFlag = useCallback(
+    (clickedField: IField) => {
+      if (flagsCount < 1) {
+        return;
+      }
+
+      setFlagValue(clickedField, false);
+    },
+    [setFlagValue, flagsCount],
+  );
+
   // Update debug cycles counter on every fields change
   useEffect(() => {
     console.log(`Cycles count: ${cycles}`);
@@ -238,5 +291,8 @@ export default function useGame(settings: ISettings) {
     fieldsOpened,
     openField,
     initFields,
+    flagsCount,
+    setFlag,
+    deleteFlag,
   };
 }

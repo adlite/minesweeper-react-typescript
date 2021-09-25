@@ -2,6 +2,7 @@ import React, {useCallback, useMemo} from 'react';
 import Panel from '../Panel';
 import Field from '../Field';
 import Settings from '../Settings';
+import Statistics from '../Statistics';
 import useGameController from '../../hooks/useGameController';
 import {GameState, SettingsLevel} from '../../types';
 
@@ -19,6 +20,9 @@ export default function Game() {
     continuePlaying,
     pause,
     gameState,
+    flagsCount,
+    setFlag,
+    deleteFlag,
   } = useGameController();
 
   // Button labels getters
@@ -69,33 +73,26 @@ export default function Game() {
               field={field}
               gameState={gameState}
               onOpen={onFieldOpen}
+              onSetFlag={setFlag}
+              onDeleteFlag={deleteFlag}
               isSmall={settings.level !== SettingsLevel.Beginner}
             />
           ))}
         </section>
         <aside className={style.aside}>
           <div className={style.stats}>
-            <div className={style.statBlock} title="Timer">
-              <div className={style.statEmoji}>🕑</div>
-              <div className={style.statValue}>{formattedTimer}</div>
-            </div>
-            <div className={style.statBlock} title="Opened fields">
-              <div className={style.statEmoji}>✅</div>
-              <div className={style.statValue}>
-                {fieldsOpened}/{settings.xFieldsCount * settings.yFieldsCount - settings.bombsCount}
-              </div>
-            </div>
-            <div className={style.statBlock} title="Bombs count">
-              <div className={style.statEmoji}>💣</div>
-              <div className={style.statValue}>{settings.bombsCount}</div>
-            </div>
-
-            <div className={style.statBlock} title="Cells count">
-              <div className={style.statEmoji}>📐</div>
-              <div className={style.statValue}>
-                {settings.xFieldsCount}x{settings.yFieldsCount}
-              </div>
-            </div>
+            <Statistics value={formattedTimer} icon="🕑" title="Timer" />
+            <Statistics
+              value={`${fieldsOpened}/${settings.xFieldsCount * settings.yFieldsCount - settings.bombsCount}`}
+              icon="✅"
+              title="Opened fields"
+            />
+            <Statistics
+              value={`${settings.bombsCount - flagsCount}/${settings.bombsCount}`}
+              icon="🚩"
+              title="Free flags count"
+            />
+            <Statistics value={`${settings.xFieldsCount}x${settings.yFieldsCount}`} icon="📐" title="Cells count" />
           </div>
           <div className={style.buttonWrapper}>
             {gameState === GameState.Playing || gameState === GameState.Idle || (
