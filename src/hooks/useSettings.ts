@@ -7,7 +7,7 @@ const settingsSet: ISettings[] = [
     fieldsInRow: 8,
     xFieldsCount: 16, // TODO: return to 8
     yFieldsCount: 8,
-    bombsCount: 10,
+    bombsCount: 40,
   },
   {
     level: SettingsLevel.Intermediate,

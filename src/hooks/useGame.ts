@@ -5,7 +5,7 @@ import {randomNumber} from '../utils/helpers';
 
 let cycles = 0; // TODO: remove counter
 
-function coordsToString([x, y]: FieldCoords) {
+function coordsToString([x, y]: FieldCoords): string {
   return `[${x},${y}]`;
 }
 
@@ -114,6 +114,59 @@ export default function useGame() {
     [findCoordsAround, generateEmptyFields, settings],
   );
 
+  const openEmptyFields = useCallback(
+    (clickedField: IField, fields: FieldsMap): void => {
+      const emptiesStack: IField[] = [clickedField];
+      const verifiedEmptiesIds = new Set<number>();
+      let opened = 0;
+
+      // Open currently clicked field
+      const clickedFieldToOpen = fields.get(coordsToString(clickedField.coords));
+
+      if (clickedFieldToOpen) {
+        clickedFieldToOpen.isOpened = true;
+        opened += 1;
+      }
+
+      // Recursively check all empty fields around clicked field
+      // and save their IDs into fieldIdsToOpen set
+      const verifyEmptiesAround = (field: IField) => {
+        const coordsAround = findCoordsAround(field.coords);
+
+        for (const coords of coordsAround) {
+          cycles += 1;
+          const sibling = fields.get(coordsToString(coords));
+
+          if (sibling && !sibling.isOpened) {
+            sibling.isOpened = true;
+            opened += 1;
+
+            if (
+              sibling.bombsAround === 0 &&
+              !emptiesStack.find(({id}) => id === sibling.id) &&
+              !verifiedEmptiesIds.has(sibling.id)
+            ) {
+              emptiesStack.push(sibling);
+            }
+          }
+        }
+
+        verifiedEmptiesIds.add(field.id);
+        emptiesStack.shift();
+
+        if (emptiesStack.length > 0) {
+          verifyEmptiesAround(emptiesStack[0]);
+        }
+      };
+
+      verifyEmptiesAround(clickedField);
+
+      setFields(new Map(fields));
+      setFieldsOpened(opened);
+    },
+    [findCoordsAround],
+  );
+
   // Public methods
   const prepareGame = useCallback(() => {
     setFields(generateEmptyFields());
@@ -126,10 +179,10 @@ export default function useGame() {
       }
 
       if (fieldsOpened === 0) {
-        setFields(generateFieldsWithBombs(clickedField));
+        openEmptyFields(clickedField, generateFieldsWithBombs(clickedField));
       }
     },
-    [fieldsOpened, generateFieldsWithBombs],
+    [fieldsOpened, generateFieldsWithBombs, openEmptyFields],
   );
 
   // Initialize game on mount
@@ -143,12 +196,13 @@ export default function useGame() {
   }, [settings, prepareGame]);
 
   // Debug cycles counter
-  useEffect(() => console.log(cycles));
+  useEffect(() => console.log(`Cycles count: ${cycles}`));
 
   return {
     settings,
     setSettingsByLevel,
     fields,
+    fieldsOpened,
     openField,
     prepareGame,
   };
