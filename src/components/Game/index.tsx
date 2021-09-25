@@ -19,7 +19,6 @@ export default function Game() {
     continuePlaying,
     pause,
     gameState,
-    freeFlagsCount,
   } = useGameController();
 
   // Button labels getters
@@ -70,8 +69,6 @@ export default function Game() {
               field={field}
               gameState={gameState}
               onOpen={onFieldOpen}
-              onSetFlag={console.log}
-              onDeleteFlag={console.log}
               isSmall={settings.level !== SettingsLevel.Beginner}
             />
           ))}
@@ -82,12 +79,6 @@ export default function Game() {
               <div className={style.statEmoji}>🕑</div>
               <div className={style.statValue}>{formattedTimer}</div>
             </div>
-            <div className={style.statBlock} title="Remaining flags">
-              <div className={style.statEmoji}>🚩</div>
-              <div className={style.statValue}>
-                {freeFlagsCount}/{settings.bombsCount}
-              </div>
-            </div>
             <div className={style.statBlock} title="Opened fields">
               <div className={style.statEmoji}>✅</div>
               <div className={style.statValue}>
@@ -97,6 +88,13 @@ export default function Game() {
             <div className={style.statBlock} title="Bombs count">
               <div className={style.statEmoji}>💣</div>
               <div className={style.statValue}>{settings.bombsCount}</div>
+            </div>
+
+            <div className={style.statBlock} title="Cells count">
+              <div className={style.statEmoji}>📐</div>
+              <div className={style.statValue}>
+                {settings.xFieldsCount}x{settings.yFieldsCount}
+              </div>
             </div>
           </div>
           <div className={style.buttonWrapper}>

@@ -9,11 +9,18 @@ interface IProps {
   isSmall: boolean;
   gameState: GameState;
   onOpen: (field: IField) => void;
-  onSetFlag: (field: IField) => void;
-  onDeleteFlag: (field: IField) => void;
 }
 
-function Field({field, isSmall, gameState, onOpen, onSetFlag, onDeleteFlag}: IProps) {
+function Field({field, isSmall, gameState, onOpen}: IProps) {
+  const [hasFlag, setFlag] = useState<boolean>(false);
+
+  // Delete flag when new game started
+  useEffect(() => {
+    if (gameState === GameState.Idle && hasFlag) {
+      setFlag(false);
+    }
+  }, [gameState, hasFlag]);
+
   const isDisabled = gameState === GameState.Pause || gameState === GameState.GameOver;
   let label: number | string = '';
 
@@ -23,7 +30,7 @@ function Field({field, isSmall, gameState, onOpen, onSetFlag, onDeleteFlag}: IPr
     } else if (field.bombsAround) {
       label = field.bombsAround;
     }
-  } else if (field.hasFlag) {
+  } else if (hasFlag) {
     label = '🚩';
   }
 
@@ -42,10 +49,10 @@ function Field({field, isSmall, gameState, onOpen, onSetFlag, onDeleteFlag}: IPr
 
   // Handlers
   const handleClick = useCallback(() => {
-    if (!field.hasFlag) {
+    if (!hasFlag) {
       onOpen(field);
     }
-  }, [field, onOpen]);
+  }, [field, onOpen, hasFlag]);
 
   const handleContextMenuClick = useCallback(
     (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -53,14 +60,14 @@ function Field({field, isSmall, gameState, onOpen, onSetFlag, onDeleteFlag}: IPr
       event.preventDefault();
 
       if (gameState === GameState.Playing && !field.isOpened) {
-        if (field.hasFlag) {
-          onDeleteFlag(field);
+        if (hasFlag) {
+          setFlag(false);
         } else {
-          onSetFlag(field);
+          setFlag(true);
         }
       }
     },
-    [field, gameState, onSetFlag, onDeleteFlag],
+    [field, gameState, hasFlag],
   );
 
   return (

@@ -2,7 +2,7 @@ import {useCallback, useEffect, useState} from 'react';
 import {IField, FieldsMap, FieldCoords, ISettings} from '../types';
 import {randomNumber} from '../utils/helpers';
 
-let cycles = 0; // TODO: Debug cycles counter
+let cycles = 0; // Debug cycles counter
 
 function coordsToString([x, y]: FieldCoords): string {
   return `[${x},${y}]`;

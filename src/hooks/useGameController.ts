@@ -16,16 +16,13 @@ export default function useGameController() {
   const [formattedTimer, setFormattedTimer] = useState<string>('00:00');
   // Current state of the game
   const [gameState, setGameState] = useState<GameState>(GameState.Idle);
-  // The number of flags remaining with the player
-  const [freeFlagsCount, setFreeFlagsCount] = useState<number>(10);
 
   // Public methods
   const prepareGame = useCallback(() => {
     initFields();
     setTimer(0);
     setGameState(GameState.Idle);
-    setFreeFlagsCount(settings.bombsCount);
-  }, [settings, initFields]);
+  }, [initFields]);
 
   const continuePlaying = useCallback(() => {
     setGameState(GameState.Playing);
@@ -91,7 +88,6 @@ export default function useGameController() {
     timer,
     formattedTimer,
     gameState,
-    freeFlagsCount,
     prepareGame,
     continuePlaying,
     pause,
