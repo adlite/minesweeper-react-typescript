@@ -17,14 +17,18 @@
 }
 
 .button {
+  display: block;
   width: 100%;
-  padding: 10px 0;
+  height: 40px;
   margin-bottom: 5px;
   color: var(--text-primary-color);
   background-color: var(--button-bg-color);
   border: 2px solid var(--button-border-color);
+  font-size: 14px;
   border-radius: 6px;
+  text-decoration: none;
   cursor: pointer;
+  text-align: center;
   transition: background-color 200ms;
 }
 
@@ -40,25 +44,22 @@
   margin-bottom: 0;
 }
 
+.button.buttonGitHub {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.button.buttonGitHub .githubIcon {
+  margin-right: 5px;
+  width: 20px;
+  height: 20px;
+}
+
 .stats {
   display: grid;
   grid-template-rows: 1fr 1fr;
   grid-template-columns: 1fr 1fr;
   gap: 5px;
   text-align: center;
-}
-
-.statBlock {
-  border: 1px solid var(--border-primary-color);
-  border-radius: 6px;
-  cursor: default;
-}
-
-.statEmoji {
-  font-size: 20px;
-}
-
-.statValue {
-  font-weight: bold;
-  font-size: 16px;
 }

@@ -1,8 +1,10 @@
 import React, {useCallback, useMemo} from 'react';
+import cn from 'classnames';
 import Panel from '../Panel';
 import Field from '../Field';
 import Settings from '../Settings';
-import useMinesGame from '../../hooks/useMinesGame';
+import Statistics from '../Statistics';
+import useGameController from '../../hooks/useGameController';
 import {GameState, SettingsLevel} from '../../types';
 
 import style from './style.module.css';
@@ -12,20 +14,20 @@ export default function Game() {
     settings,
     setSettingsByLevel,
     fields,
+    onFieldOpen,
     fieldsOpened,
     formattedTimer,
-    gameState,
-    freeFlagsCount,
     prepareGame,
     continuePlaying,
     pause,
-    openField,
+    gameState,
+    flagsCount,
     setFlag,
     deleteFlag,
-  } = useMinesGame();
+  } = useGameController();
 
   // Button labels getters
-  const getPlayButtonLabel = useCallback(() => {
+  const playButtonLabel = useMemo(() => {
     switch (gameState) {
       case GameState.Idle:
         return 'Play';
@@ -34,7 +36,7 @@ export default function Game() {
     }
   }, [gameState]);
 
-  const getPauseButtonLabel = useCallback(() => {
+  const pauseButtonLabel = useMemo(() => {
     switch (gameState) {
       case GameState.Pause:
         return 'Continue';
@@ -42,6 +44,15 @@ export default function Game() {
         return 'Pause';
     }
   }, [gameState]);
+
+  // Grid styles for specific settings
+  const fieldsStyle = useMemo(
+    () => ({
+      gridTemplateColumns: `repeat(${settings.xFieldsCount}, 1fr)`,
+      gridTemplateRows: `repeat(${settings.yFieldsCount}, 1fr)`,
+    }),
+    [settings],
+  );
 
   // Event handlers
   const handlePauseButtonClick = useCallback(() => {
@@ -52,25 +63,17 @@ export default function Game() {
     }
   }, [gameState, pause, continuePlaying]);
 
-  const fieldsStyle = useMemo(
-    () => ({
-      gridTemplateColumns: `repeat(${settings.fieldsInRow}, 1fr)`,
-      gridTemplateRows: `repeat(${settings.fieldsInRow}, 1fr)`,
-    }),
-    [settings.fieldsInRow],
-  );
-
   return (
     <>
       <Settings level={settings.level} onLevelChange={setSettingsByLevel} />
       <Panel className={style.Game}>
         <section className={style.fields} style={fieldsStyle}>
-          {fields.map((field) => (
+          {Array.from(fields.values()).map((field) => (
             <Field
               key={field.id}
               field={field}
               gameState={gameState}
-              onOpen={openField}
+              onOpen={onFieldOpen}
               onSetFlag={setFlag}
               onDeleteFlag={deleteFlag}
               isSmall={settings.level !== SettingsLevel.Beginner}
@@ -79,38 +82,39 @@ export default function Game() {
         </section>
         <aside className={style.aside}>
           <div className={style.stats}>
-            <div className={style.statBlock} title="Timer">
-              <div className={style.statEmoji}>🕑</div>
-              <div className={style.statValue}>{formattedTimer}</div>
-            </div>
-            <div className={style.statBlock} title="Remaining flags">
-              <div className={style.statEmoji}>🚩</div>
-              <div className={style.statValue}>
-                {freeFlagsCount}/{settings.bombsCount}
-              </div>
-            </div>
-            <div className={style.statBlock} title="Opened fields">
-              <div className={style.statEmoji}>✅</div>
-              <div className={style.statValue}>
-                {fieldsOpened}/{Math.pow(settings.fieldsInRow, 2) - settings.bombsCount}
-              </div>
-            </div>
-            <div className={style.statBlock} title="Bombs count">
-              <div className={style.statEmoji}>💣</div>
-              <div className={style.statValue}>{settings.bombsCount}</div>
-            </div>
+            <Statistics value={formattedTimer} icon="🕑" title="Timer" />
+            <Statistics
+              value={`${fieldsOpened}/${settings.xFieldsCount * settings.yFieldsCount - settings.bombsCount}`}
+              icon="✅"
+              title="Opened fields"
+            />
+            <Statistics
+              value={`${settings.bombsCount - flagsCount}/${settings.bombsCount}`}
+              icon="🚩"
+              title="Free flags count"
+            />
+            <Statistics value={`${settings.xFieldsCount}x${settings.yFieldsCount}`} icon="📐" title="Cells count" />
           </div>
           <div className={style.buttonWrapper}>
             {gameState === GameState.Playing || gameState === GameState.Idle || (
               <button className={style.button} onClick={prepareGame}>
-                {getPlayButtonLabel()}
+                {playButtonLabel}
               </button>
             )}
             {(gameState === GameState.Playing || gameState === GameState.Pause) && (
               <button className={style.button} onClick={handlePauseButtonClick}>
-                {getPauseButtonLabel()}
+                {pauseButtonLabel}
               </button>
             )}
+            <a
+              href="https://github.com/adlite/mines-game"
+              className={cn(style.button, style.buttonGitHub)}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <img src="/assets/img/github.svg" alt="View source on GitHub" className={style.githubIcon} />
+              View source
+            </a>
           </div>
         </aside>
       </Panel>
