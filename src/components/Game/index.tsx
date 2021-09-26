@@ -1,4 +1,5 @@
 import React, {useCallback, useMemo} from 'react';
+import cn from 'classnames';
 import Panel from '../Panel';
 import Field from '../Field';
 import Settings from '../Settings';
@@ -105,6 +106,15 @@ export default function Game() {
                 {pauseButtonLabel}
               </button>
             )}
+            <a
+              href="https://github.com/adlite/mines-game"
+              className={cn(style.button, style.buttonGitHub)}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <img src="/assets/img/github.svg" alt="View source on GitHub" className={style.githubIcon} />
+              View source
+            </a>
           </div>
         </aside>
       </Panel>
