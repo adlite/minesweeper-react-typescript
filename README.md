@@ -1,4 +1,4 @@
-# 💣 Minesweeper React Typescript
+# Minesweeper React Typescript Game
 
 ![Game demo](./docs/demo.gif)
 
