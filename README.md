@@ -1,6 +1,32 @@
 # Minesweeper React Typescript Game
 
+Legendary game written in React with Hooks and Typescript
+
 ![Game demo](./docs/demo.gif)
+
+## Demo
+See demo [here](https://minesweeper-react-typescript.vercel.app/)
+
+## How to play
+- Mines are scattered throughout a board, which is divided into fields.
+- Fields have three states: uncovered, covered and flagged.
+- A covered field is blank and clickable, while an uncovered field is exposed.
+- Flagged fields indicate a potential mine location. The number of flags is equal to the number of bombs on the board.
+- A left click uncovers a field. If you uncover a mined field, the game ends.
+- Otherwise, the uncovered field displays either a number, indicating the number of mines diagonally and/or adjacent to it, or an empty field, and all adjacent non-mined fields will automatically be uncovered.
+- Right-clicking on a field will flag it, causing a flag to appear on it. Flagged fields are still considered covered, and you can't click on them to uncover them. They must first be unflagged with an additional right-click.
+- The first click in any game will never be a mine.
+- To win the game, you must uncover all non-mine fields, at which point, the timer is stopped.
+- Flagging all the mined fields is not required.
+
+## What’s Inside?
+- Project based on [create-react-app with TypeScript](https://create-react-app.dev/docs/adding-typescript/)
+- `tsconfig.json` is in strict mode
+- No implicit and explicit `any`, only static types, only hardcore :)
+- Written entirely with hooks
+- Loops optimizations and components memoization for preventing unnecessary renders
+- Formatted with Prettier
+- Precommit Husky hooks and lint-staged
 
 ## Available Scripts
 
@@ -39,3 +65,8 @@ Instead, it will copy all the configuration files and the transitive dependencie
 
 You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
 
+## Maintainers
+[Igor Sebelev](https://github.com/adlite)
+
+## License
+MIT
