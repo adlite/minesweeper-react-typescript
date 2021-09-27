@@ -1,5 +1,5 @@
 {
-  "name": "mines-game",
+  "name": "minesweeper-react-typescript",
   "version": "1.0.0",
   "private": true,
   "dependencies": {

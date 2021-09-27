@@ -107,7 +107,7 @@ export default function Game() {
               </button>
             )}
             <a
-              href="https://github.com/adlite/mines-game"
+              href="https://github.com/adlite/minesweeper-react-typescript"
               className={cn(style.button, style.buttonGitHub)}
               target="_blank"
               rel="noreferrer"
